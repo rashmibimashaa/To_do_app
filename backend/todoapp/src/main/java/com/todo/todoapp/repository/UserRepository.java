@@ -1,6 +1,6 @@
 package com.todo.todoapp.repository;
 
-import com.todo.entity.User;
+import com.todo.todoapp.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
