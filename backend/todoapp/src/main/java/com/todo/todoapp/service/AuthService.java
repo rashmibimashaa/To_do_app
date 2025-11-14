@@ -6,6 +6,7 @@ import com.todo.todoapp.dto.RegisterRequest;
 import com.todo.todoapp.entity.User;
 import com.todo.todoapp.exception.UserAlreadyExistsException;
 import com.todo.todoapp.repository.UserRepository;
+import com.todo.todoapp.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     public User register(RegisterRequest request) {
         // Check if username already exists
@@ -49,10 +51,11 @@ public class AuthService {
             throw new RuntimeException("Invalid username or password");
         }
 
-        // For now, return simple response without JWT
-        // Ruhini will add JWT token generation later
+        // Generate JWT token
+        String token = jwtUtil.generateToken(user.getUsername());
+
         return new AuthResponse(
-                "temporary-token-" + user.getUsername(), // Temporary token
+                token,
                 user.getUsername(),
                 user.getEmail()
         );
