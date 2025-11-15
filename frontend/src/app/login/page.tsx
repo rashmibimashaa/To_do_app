@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 export default function LoginPage() {
   const router = useRouter();
 
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
@@ -15,7 +15,7 @@ export default function LoginPage() {
 
     try {
       const res = await axios.post("http://localhost:8080/api/auth/login", {
-        email,
+        username,
         password,
       });
 
@@ -70,7 +70,7 @@ export default function LoginPage() {
             {/* Email Input */}
             <div className="group">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email Address
+                User Name
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -79,11 +79,11 @@ export default function LoginPage() {
                   </svg>
                 </div>
                 <input
-                  type="email"
-                  placeholder="Enter your email"
+                  type="text"
+                  placeholder="Enter your Username"
                   className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all outline-none text-gray-700 placeholder-gray-400"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                 />
               </div>
             </div>
