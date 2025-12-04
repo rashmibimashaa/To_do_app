@@ -86,7 +86,7 @@ export default function RegisterPage() {
             {/* Name Input */}
             <div className="group">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Full Name
+                Username
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">

@@ -1,35 +1,85 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { todoApi } from "@/lib/api";
+import { useRouter } from "next/navigation";
 
 interface Todo {
   id: number;
   title: string;
+  description?: string;
+  completed?: boolean;
 }
 
 export default function TodosPage() {
-  const [todos, setTodos] = useState<Todo[]>([
-    { id: 1, title: "Sample Todo 1" },
-    { id: 2, title: "Sample Todo 2" },
-    { id: 3, title: "Sample Todo 3" },
-  ]);
+  const router = useRouter();
+  const [todos, setTodos] = useState<Todo[]>([]);
   const [newTodo, setNewTodo] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editingText, setEditingText] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  // Check if user is logged in
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      router.push('/login');
+      return;
+    }
+    loadTodos();
+  }, []);
+
+  const loadTodos = async () => {
+    try {
+      setLoading(true);
+      console.log('Loading todos...');
+      const data = await todoApi.getAllTodos();
+      console.log('Todos loaded:', data);
+      setTodos(data);
+      setError("");
+    } catch (err: any) {
+      console.error('Error loading todos:', err);
+      setError('Failed to load todos. Please try logging in again.');
+
+      // If unauthorized, redirect to login
+      if (err.message?.includes('401') || err.message?.includes('unauthorized')) {
+        localStorage.removeItem('token');
+        router.push('/login');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Add new todo
-  const handleAdd = () => {
+  const handleAdd = async () => {
     if (!newTodo.trim()) return;
-    const newItem: Todo = {
-      id: todos.length ? todos[todos.length - 1].id + 1 : 1,
-      title: newTodo,
-    };
-    setTodos([...todos, newItem]);
-    setNewTodo("");
+
+    try {
+      console.log('Creating todo:', newTodo);
+      const newItem = await todoApi.createTodo(newTodo);
+      console.log('Todo created:', newItem);
+      setTodos([...todos, newItem]);
+      setNewTodo("");
+      setError("");
+    } catch (err) {
+      console.error('Error creating todo:', err);
+      setError('Failed to create todo');
+    }
   };
 
   // Delete todo
-  const handleDelete = (id: number) => {
-    setTodos(todos.filter((todo) => todo.id !== id));
+  const handleDelete = async (id: number) => {
+    try {
+      console.log('Deleting todo:', id);
+      await todoApi.deleteTodo(id);
+      console.log('Todo deleted');
+      setTodos(todos.filter((todo) => todo.id !== id));
+      setError("");
+    } catch (err) {
+      console.error('Error deleting todo:', err);
+      setError('Failed to delete todo');
+    }
   };
 
   // Start editing
@@ -39,11 +89,21 @@ export default function TodosPage() {
   };
 
   // Save edited todo
-  const saveEdit = (id: number) => {
+  const saveEdit = async (id: number) => {
     if (!editingText.trim()) return;
-    setTodos(todos.map((t) => (t.id === id ? { ...t, title: editingText } : t)));
-    setEditingId(null);
-    setEditingText("");
+
+    try {
+      console.log('Updating todo:', id, editingText);
+      const updated = await todoApi.updateTodo(id, { title: editingText });
+      console.log('Todo updated:', updated);
+      setTodos(todos.map((t) => (t.id === id ? { ...t, title: editingText } : t)));
+      setEditingId(null);
+      setEditingText("");
+      setError("");
+    } catch (err) {
+      console.error('Error updating todo:', err);
+      setError('Failed to update todo');
+    }
   };
 
   // Cancel editing
@@ -51,6 +111,23 @@ export default function TodosPage() {
     setEditingId(null);
     setEditingText("");
   };
+
+  // Logout
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    router.push('/login');
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+          <div className="text-xl text-gray-700">Loading todos...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-6">
@@ -62,6 +139,13 @@ export default function TodosPage() {
       </div>
 
       <div className="max-w-4xl mx-auto relative">
+        {/* Error message */}
+        {error && (
+          <div className="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl">
+            <p className="font-medium">{error}</p>
+          </div>
+        )}
+
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div className="flex items-center space-x-4">
@@ -74,11 +158,11 @@ export default function TodosPage() {
               <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 My Todos
               </h1>
-              <p className="text-gray-600 text-sm mt-1">Preview Mode</p>
+              <p className="text-gray-600 text-sm mt-1">Manage your tasks</p>
             </div>
           </div>
           <button
-            onClick={() => alert("No backend yet")}
+            onClick={handleLogout}
             className="flex items-center space-x-2 bg-white/80 backdrop-blur-lg border-2 border-red-200 text-red-600 px-5 py-2.5 rounded-xl hover:bg-red-50 hover:border-red-300 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
