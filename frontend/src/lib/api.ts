@@ -44,6 +44,52 @@ export const authApi = {
   }
 };
 
+// FILE API
+export const fileApi = {
+  // Upload file
+  uploadFile: async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_URL}/files/upload`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      body: formData
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to upload file');
+    }
+
+    return await response.json();
+  },
+
+  // Get file download URL
+  getFileUrl: (filename: string) => {
+    return `${API_URL}/files/download/${filename}`;
+  },
+
+  // Delete file
+  deleteFile: async (filename: string) => {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_URL}/files/${filename}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to delete file');
+    }
+
+    return await response.json();
+  }
+};
+
 export const todoApi = {
   // Get all todos
   getAllTodos: async () => {
@@ -59,15 +105,38 @@ export const todoApi = {
     return await response.json();
   },
 
+  // NEW: Get a specific todo by ID
+  getTodoById: async (id: number) => {
+    const response = await fetch(`${API_URL}/todos/${id}`, {
+      method: 'GET',
+      headers: getAuthHeaders()
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch todo');
+    }
+
+    return await response.json();
+  },
+
   // Create todo
-  createTodo: async (title: string, description?: string) => {
+  createTodo: async (
+    title: string,
+    description?: string,
+    documentPath?: string,
+    documentName?: string,
+    dueDate?: string
+  ) => {
     const response = await fetch(`${API_URL}/todos`, {
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify({
         title,
         description: description || '',
-        completed: false
+        completed: false,
+        documentPath: documentPath || null,
+        documentName: documentName || null,
+        dueDate: dueDate || null
       })
     });
 
@@ -79,7 +148,17 @@ export const todoApi = {
   },
 
   // Update todo
-  updateTodo: async (id: number, data: { title?: string; description?: string; completed?: boolean }) => {
+  updateTodo: async (
+    id: number,
+    data: {
+      title?: string;
+      description?: string;
+      completed?: boolean;
+      documentPath?: string;
+      documentName?: string;
+      dueDate?: string;
+    }
+  ) => {
     const response = await fetch(`${API_URL}/todos/${id}`, {
       method: 'PUT',
       headers: getAuthHeaders(),
@@ -93,7 +172,7 @@ export const todoApi = {
     return await response.json();
   },
 
-  // Toggle todo completion
+  // NEW: Toggle todo completion
   toggleTodo: async (id: number) => {
     const response = await fetch(`${API_URL}/todos/${id}/toggle`, {
       method: 'PATCH',
@@ -121,7 +200,7 @@ export const todoApi = {
     return await response.json();
   },
 
-  // Get completed todos
+  // NEW: Get completed todos only
   getCompletedTodos: async () => {
     const response = await fetch(`${API_URL}/todos/completed`, {
       method: 'GET',
@@ -135,7 +214,7 @@ export const todoApi = {
     return await response.json();
   },
 
-  // Get incomplete todos
+  // NEW: Get incomplete todos only
   getIncompleteTodos: async () => {
     const response = await fetch(`${API_URL}/todos/incomplete`, {
       method: 'GET',

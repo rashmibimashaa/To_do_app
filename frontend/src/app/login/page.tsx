@@ -70,7 +70,7 @@ export default function LoginPage() {
             {/* Email Input */}
             <div className="group">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                User Name
+                Username
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -146,7 +146,7 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Social Login Buttons */}
+          {/* Social Login Buttons*/}
           <div className="grid grid-cols-2 gap-3">
             <button className="flex items-center justify-center px-4 py-2.5 border-2 border-gray-200 rounded-xl hover:border-gray-300 hover:bg-gray-50 transition-all group">
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
