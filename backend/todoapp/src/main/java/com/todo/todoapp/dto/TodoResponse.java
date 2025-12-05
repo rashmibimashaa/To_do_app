@@ -1,5 +1,6 @@
 package com.todo.todoapp.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.todo.todoapp.entity.Todo;
 import lombok.Data;
 
@@ -13,6 +14,12 @@ public class TodoResponse {
     private Boolean completed;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private String documentPath;
+    private String documentName;
+
+    // Calender feature - Due date field
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime dueDate;
 
     // Constructor to convert Todo entity to TodoResponse
     public TodoResponse(Todo todo) {
@@ -22,5 +29,8 @@ public class TodoResponse {
         this.completed = todo.getCompleted();
         this.createdAt = todo.getCreatedAt();
         this.updatedAt = todo.getUpdatedAt();
+        this.documentPath = todo.getDocumentPath();
+        this.documentName = todo.getDocumentName();
+        this.dueDate = todo.getDueDate(); // ADD THIS
     }
 }

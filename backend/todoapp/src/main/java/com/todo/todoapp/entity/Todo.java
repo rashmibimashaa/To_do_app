@@ -30,6 +30,16 @@ public class Todo {
     @Column(nullable = false)
     private Boolean completed = false;
 
+    @Column(name = "document_path")
+    private String documentPath;
+
+    @Column(name = "document_name")
+    private String documentName;
+
+    // Calender feature - Due date field
+    @Column(name = "due_date")
+    private LocalDateTime dueDate;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnore

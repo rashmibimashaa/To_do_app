@@ -42,7 +42,7 @@ public class TodoService {
         return new TodoResponse(todo);
     }
 
-    // Create a new todo
+    // Create a new todo - UPDATED WITH DOCUMENT AND DUE DATE SUPPORT
     @Transactional
     public TodoResponse createTodo(TodoRequest request, String username) {
         User user = userRepository.findByUsername(username)
@@ -54,11 +54,18 @@ public class TodoService {
         todo.setCompleted(request.getCompleted() != null ? request.getCompleted() : false);
         todo.setUser(user);
 
+        // Document support
+        todo.setDocumentPath(request.getDocumentPath());
+        todo.setDocumentName(request.getDocumentName());
+
+        // ADD THIS - Due date support
+        todo.setDueDate(request.getDueDate());
+
         Todo savedTodo = todoRepository.save(todo);
         return new TodoResponse(savedTodo);
     }
 
-    // Update an existing todo
+    // Update an existing todo - UPDATED WITH DOCUMENT AND DUE DATE SUPPORT
     @Transactional
     public TodoResponse updateTodo(Long id, TodoRequest request, String username) {
         User user = userRepository.findByUsername(username)
@@ -71,6 +78,19 @@ public class TodoService {
         todo.setDescription(request.getDescription());
         if (request.getCompleted() != null) {
             todo.setCompleted(request.getCompleted());
+        }
+
+        // Document support
+        if (request.getDocumentPath() != null) {
+            todo.setDocumentPath(request.getDocumentPath());
+        }
+        if (request.getDocumentName() != null) {
+            todo.setDocumentName(request.getDocumentName());
+        }
+
+        // Due date support
+        if (request.getDueDate() != null) {
+            todo.setDueDate(request.getDueDate());
         }
 
         Todo updatedTodo = todoRepository.save(todo);
