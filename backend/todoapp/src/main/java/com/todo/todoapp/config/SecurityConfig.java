@@ -46,6 +46,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()  // Public endpoints
+                        .requestMatchers("/api/files/download/**").permitAll()  // Allow file downloads
                         .anyRequest().authenticated()  // Protected endpoints
                 )
                 .sessionManagement(session ->
