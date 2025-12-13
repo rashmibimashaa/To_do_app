@@ -14,7 +14,7 @@ export default function LoginPage() {
     e.preventDefault();
 
     try {
-      const res = await authApi.login({ email: username, password });
+      const res = await authApi.login({ username: username, password });
 
       // Save token
       localStorage.setItem("token", res.token);
