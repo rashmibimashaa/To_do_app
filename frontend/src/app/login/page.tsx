@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
-import axios from "axios";
 import { useRouter } from "next/navigation";
+import { authApi } from "@/lib/api";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -14,13 +14,10 @@ export default function LoginPage() {
     e.preventDefault();
 
     try {
-      const res = await axios.post("http://localhost:8080/api/auth/login", {
-        username,
-        password,
-      });
+      const res = await authApi.login({ email: username, password });
 
       // Save token
-      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("token", res.token);
 
       router.push("/todos"); // Redirect to todos page
     } catch (err: any) {
