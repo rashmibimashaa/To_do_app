@@ -32,7 +32,7 @@ export const authApi = {
     return { success: true, data: result };
   },
 
-  login: async (data: { email: string; password: string }) => {
+  login: async (data: { username: string; password: string }) => {
     const response = await fetch(`${API_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
