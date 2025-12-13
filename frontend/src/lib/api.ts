@@ -2,6 +2,10 @@
 
 const API_URL = `${process.env.NEXT_PUBLIC_API_URL || 'https://todoapp-backend-kqjw.onrender.com'}/api`;
 
+// Debug logs
+console.log('🔍 API_URL:', API_URL);
+console.log('🔍 NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL);
+
 // Get auth token from localStorage
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token');
